@@ -1,35 +1,96 @@
-NAME
-    Mail::RBL - Perl extension to access RBL-style host verification
-    services
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-SYNOPSIS
-      use Mail::RBL;
 
-      my $list = new Mail::RBL('list.org');
+Mail::RBL - Perform queries to blacklists
+- -----------------------------------------
 
-      if ($list->check($host)) {
-          print "$host is in the list";
-      }
+This module is meant to help querying blackhole lists, typically for
+use in anti-spam solutions.
 
-DESCRIPTION
-    This module eases the task of checking if a given host is in the list.
-    The methods available are described below:
+This code could be used as follows:
 
-    `->new(suffix)'
-        Creates a list handle. The `suffix' parameter is mandatory and
-        specifies which suffix to append to the queries.
+  use Mail::RBL;
 
-    `->check($host)'
-        `$host' can be either a hostname or an IP address. In the case of an
-        IP Address, any trailing netmask (anything after a '/' character)
-        will be ignored. In the case of a hostname, all the IP addresses
-        will be looked up and checked against the list. If any of the
-        addresses is in the list, the host will be considered in the list as
-        a whole.
+  my $rbl = new Mail::RBL 'list.dsbl.org';
+  print "yeah!\n" unless $rbl->check('10.10.10.10');
 
-AUTHOR
-    Luis E. Munoz <lem@cantv.net>
+This module is entirely written in  Perl, so you do not need access to
+a compiler to use it.  It  has been extensively tested in a variety of
+platforms.  An extensive  test suite  is provided  with the  module to
+verify correct results.
 
-SEE ALSO
-    perl(1).
+The lastest version of this module should be preferred. You can obtain
+it  on http://www.cpan.org/authors/id/L/LU/LUISMUNOZ/  or  one of  the
+many CPAN  mirrors. Please find a  mirror near you to  help spread the
+load.
+
+This module depends on you having the following co-requisite modules
+(which you can obtain from CPAN):
+
+- - Test::More
+- - NetAddr::IP
+
+To install, follow the standard CPAN recipe of:
+
+$ perl Makefile.PL
+$ make
+$ make test
+
+If all tests pass, then do
+
+$ make install
+
+To access the module's documentation, please see
+
+$ perldoc Mail::RBL
+
+Bug  reports  are  welcome. Please  do  not  forget  to tell  me  what
+version/platform are you running this code on. Providing a small piece
+of  code that  shows the  bug helps  me a  lot in  sorting it  out and
+possibly in writting more tests for the distribution.
+
+Also, this code is intended to be strict and -w safe, so please report
+cases where warnings are generated so that I can fix them.
+
+Report your bugs to me (luismunoz@cpan.org).
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution.  This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc".  This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution.  If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+This information includes the correct keys, fingerprints, etc.Note
+that this README file should also be signed.
+
+LICENSE AND WARRANTY
+
+This software is (c) Luis E. Muñoz.  It can be used under the terms
+of the perl artistic license provided that proper credit for the work
+of the author is preserved in the form of this copyright notice and
+license for this module.
+
+No warranty of any kind is expressed or implied. This code might make
+your computer go up in a puff of black smoke.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQE+Xu1vQyDWGRI/hhARAuA+AJ9RINQ+9ZXonkeIGmaEEc1KuMpWVACeIzhq
+/tF2SE0tj+CN1aRByLHBRx4=
+=HZSx
+-----END PGP SIGNATURE-----
+
+$Id: README,v 1.3 2003/02/28 05:04:01 lem Exp $
 

@@ -1,6 +1,0 @@
-Revision history for Perl extension Mail::RBL.
-
-1.00  Mon Sep 25 10:35:36 2000
-	- original version; created by h2xs 1.20 with options
-		-AOXcfn Mail::RBL -v 1.00
-

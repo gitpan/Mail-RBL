@@ -1,6 +1,8 @@
-Changes
-Makefile.PL
-README
 MANIFEST
+Makefile.PL
 RBL.pm
-test.pl
+README
+t/00-load.t
+t/10-rbl.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
