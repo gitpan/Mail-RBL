@@ -2,14 +2,15 @@ package Mail::RBL;
 
 require 5.005_62;
 use Carp;
+use Socket;
 use strict;
 use warnings;
 use Net::DNS;
-use NetAddr::IP;
+use NetAddr::IP ':aton';
 
-# $Id: RBL.pm,v 1.3 2004/05/11 16:50:41 lem Exp $
+# $Id: RBL.pm,v 1.7 2005/12/12 21:52:25 lem Exp $
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 =pod
 
@@ -153,19 +154,18 @@ sub _do_txt {
 
     my $res = Net::DNS::Resolver->new;
     my $q = $res->query($host . '.' . $self->{suffix}, "TXT");
-    my $txt = undef;
+    my @txt = ();
 
     if ($q)
     {
 	for my $rr ($q->answer)
 	{
 	    next unless $rr->class eq 'IN' and $rr->type eq 'TXT';
-	    $txt .= ' ' if $txt;
-	    $txt .= $rr->rdatastr;
+	    push @txt, $rr->rdatastr;
 	}
     }
 
-    return $txt;
+    return @txt;
 }
 
 sub _do_check {
@@ -175,7 +175,7 @@ sub _do_check {
     my $res = ((gethostbyname($host . '.' . $self->{'suffix'}))[4])[0];
     if (defined $res)
     {
-	return new NetAddr::IP $res;
+	return NetAddr::IP->new(inet_ntoa($res));
     }
     return;
 }

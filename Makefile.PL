@@ -6,7 +6,7 @@ WriteMakefile(
     'PREREQ_PM'		=> {
 	'Test::More'	=> 0,
 	'Net::DNS'	=> 0,
-	'NetAddr::IP'	=> 3.14,
+	'NetAddr::IP'	=> 3.26,
     }, # e.g., Module::Name => 1.1
 
 	      ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

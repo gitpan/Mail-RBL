@@ -2,8 +2,9 @@
 Hash: SHA1
 
 
+
 Mail::RBL - Perform queries to blacklists
-- -----------------------------------------
+- - -----------------------------------------
 
 This module is meant to help querying blackhole lists, typically for
 use in anti-spam solutions.
@@ -28,8 +29,8 @@ load.
 This module depends on you having the following co-requisite modules
 (which you can obtain from CPAN):
 
-- - Test::More
-- - NetAddr::IP
+- - - Test::More
+- - - NetAddr::IP
 
 To install, follow the standard CPAN recipe of:
 
@@ -55,6 +56,17 @@ cases where warnings are generated so that I can fix them.
 
 Report your bugs to me (luismunoz@cpan.org).
 
+DO YOU WANT TO SAY THANKS?
+
+I've been asked this question enough times so as to setup a page where
+you can express your gratitude, at either of those URLs
+
+	http://mipagina.cantv.net/lem/thanks-en.html (English)
+	http://mipagina.cantv.net/lem/thanks-es.html (Spanish)
+
+This is in no way a  requirement for using my code, getting support or
+requesting features.
+
 SECURITY CONSIDERATIONS
 
 I have no control on the machanisms involved in the storage or
@@ -77,20 +89,18 @@ that this README file should also be signed.
 
 LICENSE AND WARRANTY
 
-This software is (c) Luis E. Muñoz.  It can be used under the terms
+This software is (c) Luis E. MuÃ±oz.  It can be used under the terms
 of the perl artistic license provided that proper credit for the work
 of the author is preserved in the form of this copyright notice and
 license for this module.
 
 No warranty of any kind is expressed or implied. This code might make
 your computer go up in a puff of black smoke.
+
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.1 (Darwin)
 
-iD8DBQE+Xu1vQyDWGRI/hhARAuA+AJ9RINQ+9ZXonkeIGmaEEc1KuMpWVACeIzhq
-/tF2SE0tj+CN1aRByLHBRx4=
-=HZSx
+iD8DBQFDnfA/QyDWGRI/hhARAk7zAKChr+Nc8sDu93nuHtC3xJJbep+KAwCeKljW
+lxZwaf03rntkPWrHZCi/byM=
+=0UWN
 -----END PGP SIGNATURE-----
-
-$Id: README,v 1.3 2003/02/28 05:04:01 lem Exp $
-
