@@ -8,9 +8,9 @@ use warnings;
 use Net::DNS;
 use NetAddr::IP ':aton';
 
-# $Id: RBL.pm,v 1.7 2005/12/12 21:52:25 lem Exp $
+# $Id: RBL.pm,v 1.9 2006/12/08 00:01:14 lem Exp $
 
-our $VERSION = '1.04';
+our $VERSION = do { sprintf " %d.%02d", (q$Revision: 1.9 $ =~ /\d+/g) };
 
 =pod
 
@@ -23,6 +23,10 @@ Mail::RBL - Perl extension to access RBL-style host verification services
   use Mail::RBL;
 
   my $list = new Mail::RBL('list.org');
+
+  # You can also specify a resolver to use with Net::DNS::Resolver
+
+  my $list = new Mail::RBL('list.org', $res);
 
   if ($list->check($host)) {
       print "$host is in the list";
@@ -43,11 +47,14 @@ list. The methods available are described below:
 
 =over
 
-=item C<-E<gt>new(suffix)>
+=item C<-E<gt>new(suffix, resolver)>
 
 Creates a list handle. The C<suffix> parameter is mandatory and
 specifies which suffix to append to the queries. If left unspecified,
 defaults to C<bl.spamcop.net>.
+
+An optional DNS resolver can be specified. An object of the
+Net::DNS::Resolver(3) class is expected.
 
 =cut
 
@@ -55,9 +62,11 @@ sub new {
     my $type = shift;
     my $class = ref($type) || $type || "Mail::RBL";
     my $suffix = shift;
+    my $res = shift || Net::DNS::Resolver->new;
     
     my $self = {
-	'suffix' => defined $suffix ? $suffix : 'bl.spamcop.net',
+	suffix	=> defined $suffix ? $suffix : 'bl.spamcop.net',
+	res	=> $res,
     };
 
     bless $self, $class;
@@ -152,7 +161,7 @@ sub _do_txt {
     my $self = shift;
     my $host = shift;
 
-    my $res = Net::DNS::Resolver->new;
+    my $res = $self->{res};
     my $q = $res->query($host . '.' . $self->{suffix}, "TXT");
     my @txt = ();
 
@@ -218,6 +227,16 @@ __END__
 
 =head1 HISTORY
 
+  $Log: RBL.pm,v $
+  Revision 1.9  2006/12/08 00:01:14  lem
+  Get version straight from the CVS revision.
+
+  Revision 1.8  2006/12/07 23:58:07  lem
+  Allow the user to provide a Net::DNS::Resolver object to perform DNS
+  resolution - This allows finer control over how the queries are
+  performed. Suggested by Eric Langheinrich.
+
+
 =over
 
 =item 1.00
@@ -239,6 +258,6 @@ Luis E. Munoz <luismunoz@cpan.org>
 
 =head1 SEE ALSO
 
-perl(1).
+Net::DNS::Resolver(3), perl(1).
 
 =cut

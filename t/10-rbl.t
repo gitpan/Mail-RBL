@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use Test::More;
+use Net::DNS::Resolver;
 
 @prefixes = qw(
 	       bl.spamcop.net
@@ -33,8 +34,8 @@ SKIP:
 	diag ('');
     }
 
-    plan  tests => @prefixes*3 + (grep {/spamcop/} @prefixes)*5 + 
-	@rhsbls*8 + 1;
+    plan  tests => @prefixes*4 + (grep {/spamcop/} @prefixes)*10 + 
+	@rhsbls*16 + 1;
 
     diag('');
     diag('');
@@ -51,44 +52,68 @@ SKIP:
 
     for (@prefixes)
     {
-	my $rbl = new Mail::RBL $_;
-	isa_ok($rbl, 'Mail::RBL');
+	my $rbl_i = new Mail::RBL $_;
+	my $rbl_e = new Mail::RBL $_, Net::DNS::Resolver->new;
+	isa_ok($rbl_i, 'Mail::RBL');
+	isa_ok($rbl_e, 'Mail::RBL');
 
-	ok(!$rbl->check('127.0.0.1'), 
+	ok(!$rbl_i->check('127.0.0.1'), 
 	   "Check localhost (unblocked) against $_");
-	ok($rbl->check('127.0.0.2'), 
+	ok($rbl_i->check('127.0.0.2'), 
 	   "Check 127.0.0.2 (blocked) against $_");
     }
 
     for (grep { $_ =~ /spamcop/ } @prefixes)
     {
-	my $rbl = new Mail::RBL $_;
-	isa_ok($rbl, 'Mail::RBL');
+	my $rbl_i = new Mail::RBL $_;
+	my $rbl_e = new Mail::RBL $_, Net::DNS::Resolver->new;
+	isa_ok($rbl_i, 'Mail::RBL');
+	isa_ok($rbl_e, 'Mail::RBL');
 
-	my @r = $rbl->check('127.0.0.1');
-	ok(!@r, "Check localhost (unblocked) in array context against $_");
-	@r = $rbl->check('127.0.0.2');
-	ok(@r == 2, "Check 127.0.0.2 (blocked) in array context against $_");
-	ok($r[0], "True block result");
-	ok($r[1], "Non-empty message returned");
+	my @r_i = $rbl_i->check('127.0.0.1');
+	my @r_e = $rbl_e->check('127.0.0.1');
+	ok(!@r_i, "Localhost in array context against $_ (int res)");
+	ok(!@r_e, "Localhost in array context against $_ (ext res)");
+	@r_i = $rbl_i->check('127.0.0.2');
+	@r_e = $rbl_i->check('127.0.0.2');
+	ok(@r_i == 2, "127.0.0.2 in array context against $_ (int res)");
+	ok(@r_e == 2, "127.0.0.2 in array context against $_ (ext res)");
+	ok($r_i[0], "True block result (int res)");
+	ok($r_e[0], "True block result (ext res)");
+	ok($r_i[1], "Non-empty message returned (int res)");
+	ok($r_e[1], "Non-empty message returned (ext res)");
     }
 
     for (@rhsbls)
     {
-	my $rbl = new Mail::RBL $_;
-	isa_ok($rbl, 'Mail::RBL');
+	my $rbl_i = new Mail::RBL $_;
+	my $rbl_e = new Mail::RBL $_, Net::DNS::Resolver->new;
 
-	ok(!$rbl->check_rhsbl('127.0.0.1'), 
-	   "Check unlisted localhost rhsbl $_");
-	ok($rbl->check_rhsbl('example.tld'),
-	   "Check example.tld rhsbl $_");
+	isa_ok($rbl_i, 'Mail::RBL');
+	isa_ok($rbl_e, 'Mail::RBL');
 
-	my @r = $rbl->check_rhsbl('127.0.0.1');
-	ok(!@r, "Unlisted localhost in array context is false: $_");
-	@r = $rbl->check_rhsbl('example.tld');
-	ok(@r, "Listed domain in array context is true: $_");
-	ok(@r == 2, "Listed domain in array context has proper count: $_");
-	ok($r[0], "Listed domain in array context has true value: $_");
-	ok($r[1], "Listed domain in array context has non-empty message: $_");
+	ok(!$rbl_i->check_rhsbl('127.0.0.1'), 
+	   "Check localhost rhsbl $_ (int res)");
+	ok(!$rbl_e->check_rhsbl('127.0.0.1'), 
+	   "Check localhost rhsbl $_ (ext res)");
+	ok($rbl_i->check_rhsbl('example.tld'),
+	   "Check example.tld rhsbl $_ (int res)");
+	ok($rbl_e->check_rhsbl('example.tld'),
+	   "Check example.tld rhsbl $_ (ext res)");
+
+	my @r_i = $rbl_i->check_rhsbl('127.0.0.1');
+	ok(!@r_i, "Localhost in array context is false: $_ (int res)");
+	my @r_e = $rbl_e->check_rhsbl('127.0.0.1');
+	ok(!@r_e, "Localhost in array context is false: $_ (ext res)");
+	@r_i = $rbl_i->check_rhsbl('example.tld');
+	@r_e = $rbl_i->check_rhsbl('example.tld');
+	ok(@r_i, "Listed domain in array context is true: $_ (int res)");
+	ok(@r_e, "Listed domain in array context is true: $_ (ext res)");
+	ok(@r_i == 2, "Listed domain in array context count: $_ (int res)");
+	ok(@r_e == 2, "Listed domain in array context count: $_ (ext res)");
+	ok($r_i[0], "Domain in array context has value: $_ (int res)");
+	ok($r_i[1], "Domain in array context non-empty message: $_ (int res)");
+	ok($r_e[0], "Domain in array context has true value: $_ (ext res)");
+	ok($r_e[1], "Domain in array context non-empty message: $_ (ext res)");
     }
 }
