@@ -8,9 +8,9 @@ use warnings;
 use Net::DNS;
 use NetAddr::IP ':aton';
 
-# $Id: RBL.pm,v 1.9 2006/12/08 00:01:14 lem Exp $
+# $Id: RBL.pm,v 1.10 2007/04/25 04:22:04 lem Exp $
 
-our $VERSION = do { sprintf " %d.%02d", (q$Revision: 1.9 $ =~ /\d+/g) };
+our $VERSION = do { sprintf " %d.%02d", (q$Revision: 1.10 $ =~ /\d+/g) };
 
 =pod
 
@@ -77,8 +77,7 @@ sub new {
 =item C<-E<gt>check($host)>
 
 C<$host> can be either a hostname or an IP address. In the case of an
-IP Address, any trailing netmask (anything after a '/' character) will
-be ignored. In the case of a hostname, all the IP addresses will be
+IP Address. In the case of a hostname, all the IP addresses will be
 looked up and checked against the list. If B<any> of the addresses is
 in the list, the host will be considered in the list as a whole.
 
@@ -142,7 +141,7 @@ sub check_rhsbl ($$)
     croak "Must call ->check_rhsbl() with a host to check"
 	unless length $host;
 
-    if (my $val = $self->_do_check_rhsbl($host)) 
+    if (my $val = $self->_do_check($host)) 
     { 
 	if (wantarray)
 	{
@@ -181,22 +180,16 @@ sub _do_check {
     my $self = shift;
     my $host = shift;
 
-    my $res = ((gethostbyname($host . '.' . $self->{'suffix'}))[4])[0];
-    if (defined $res)
-    {
-	return NetAddr::IP->new(inet_ntoa($res));
-    }
-    return;
-}
+    my $res = $self->{res};
+    my $q = $res->query($host . '.' . $self->{suffix}, "A");
 
-sub _do_check_rhsbl {
-    my $self = shift;
-    my $host = shift;
-
-    my $res = ((gethostbyname($host . '.' . $self->{'suffix'}))[4])[0];
-    if (defined $res)
+    if ($q)
     {
-	return new NetAddr::IP $res;
+	for my $rr ($q->answer)
+	{
+	    next unless $rr->class eq 'IN' and $rr->type eq 'A';
+	    return NetAddr::IP->new($rr->address);
+	}
     }
     return;
 }
@@ -205,7 +198,7 @@ sub _inverted_addresses {
     my $host = shift;
     my @addresses;
     my @ret;
-    
+
     if ($host =~ /^\d+\.\d+\.\d+\.\d+$/) {
 	push @ret, join('.', reverse split(/\./, $host));
     }
@@ -228,6 +221,10 @@ __END__
 =head1 HISTORY
 
   $Log: RBL.pm,v $
+  Revision 1.10  2007/04/25 04:22:04  lem
+  Finished adding support for the custom resolver code - Implementation
+  was incomplete
+
   Revision 1.9  2006/12/08 00:01:14  lem
   Get version straight from the CVS revision.
 

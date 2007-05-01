@@ -5,7 +5,7 @@ use Net::DNS::Resolver;
 
 @prefixes = qw(
 	       bl.spamcop.net
-	       relays.ordb.org
+	       dnsbl.sorbs.net
 	       list.dsbl.org
 	       multihop.dsbl.org
 	       unconfirmed.dsbl.org
